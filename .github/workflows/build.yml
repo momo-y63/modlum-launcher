@@ -2,9 +2,17 @@ name: Build Windows installer
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Installer'ı mevcut bir Release'e ekle (örn. v1.0.0). Boş bırakılırsa yalnızca artifact üretilir."
+        required: false
+        default: ""
   push:
     tags:
       - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
   windows:
@@ -23,6 +31,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
       - name: Typecheck
         run: pnpm typecheck
@@ -38,3 +48,13 @@ jobs:
           name: modlum-launcher-windows
           path: dist/*.exe
           if-no-files-found: error
+
+      - name: Attach installer to release
+        if: startsWith(github.ref, 'refs/tags/') || inputs.release_tag != ''
+        shell: bash
+        run: |
+          TAG="${{ inputs.release_tag }}"
+          if [ -z "$TAG" ]; then TAG="${GITHUB_REF_NAME}"; fi
+          gh release upload "$TAG" dist/*.exe --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

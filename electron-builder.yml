@@ -1,0 +1,22 @@
+appId: com.modlum.launcher
+productName: Modlum Launcher
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+asarUnpack:
+  - resources/**
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: build/icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  shortcutName: Modlum Launcher
+  artifactName: ModlumLauncher-${version}-Setup.${ext}

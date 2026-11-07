@@ -1,3 +1,7 @@
+[![Build](https://github.com/momo-y63/modlum-launcher/actions/workflows/build.yml/badge.svg)](https://github.com/momo-y63/modlum-launcher/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/momo-y63/modlum-launcher?display_name=tag)](https://github.com/momo-y63/modlum-launcher/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-0e7c8c.svg)](LICENSE)
+
 # Modlum Launcher
 
 Windows için modern bir **Minecraft: Java Edition** başlatıcısı. Electron + React + TypeScript ile
@@ -34,7 +38,7 @@ yazıldı; sürüm ve loader kurulumunu, Java'yı ve hesapları kullanıcının 
 
 ## Kurulum (kullanıcı)
 
-[Releases](../../releases) sayfasından `ModlumLauncher-*-Setup.exe` dosyasını indirip çalıştır.
+[Releases](https://github.com/momo-y63/modlum-launcher/releases) sayfasından `ModlumLauncher-*-Setup.exe` dosyasını indirip çalıştır.
 Kurulum yönetici izni gerektirmez (per-user NSIS).
 
 ## Geliştirme

@@ -1977,7 +1977,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   font-size: 12.5px;
   font-weight: 700;
   color: var(--ink-soft);
-  transition: all 0.16s var(--ease);
+  transition: background-color 0.16s var(--ease), color 0.16s var(--ease), border-color 0.16s var(--ease), transform 0.16s var(--ease);
 }
 .tour-ram:hover {
   border-color: var(--line-strong);
@@ -2147,7 +2147,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   font-weight: 700;
   color: var(--muted);
   background: transparent;
-  transition: all 0.16s var(--ease);
+  transition: background-color 0.16s var(--ease), color 0.16s var(--ease), border-color 0.16s var(--ease), transform 0.16s var(--ease);
 }
 .ram-preset:hover {
   border-color: var(--line-strong);
@@ -3649,4 +3649,198 @@ input[type='range']::-webkit-slider-thumb:hover {
 }
 .instance-icon-wrap {
   background: var(--cloud-raised);
+}
+
+/* =====================================================================
+   Modlum — Pro katmanı: hareket sistemi + cila
+   Kural: yalnızca transform ve opacity animasyonu. blur, backdrop-filter,
+   box-shadow animasyonu ve toplu will-change yok (donmanın sebebi bunlardı).
+   ===================================================================== */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-fast: 0.14s;
+  --t-base: 0.24s;
+  --t-slow: 0.4s;
+}
+
+/* Sayfa geçişi: kısa, yumuşak, yalnızca opacity + transform */
+.page {
+  animation: page-in 0.32s var(--ease-out) both;
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Liste girişleri: ilk 8 öğe sırayla, gerisi anında */
+.stagger > * {
+  animation: rise 0.4s var(--ease-out) both;
+}
+.stagger > *:nth-child(2) { animation-delay: 30ms; }
+.stagger > *:nth-child(3) { animation-delay: 60ms; }
+.stagger > *:nth-child(4) { animation-delay: 90ms; }
+.stagger > *:nth-child(5) { animation-delay: 120ms; }
+.stagger > *:nth-child(6) { animation-delay: 150ms; }
+.stagger > *:nth-child(7) { animation-delay: 180ms; }
+.stagger > *:nth-child(8) { animation-delay: 210ms; }
+.stagger > *:nth-child(n + 9) { animation: none; }
+.tab-panel {
+  animation: tab-in 0.24s var(--ease-out);
+}
+.modal {
+  animation: modal-pop 0.28s var(--ease-out);
+}
+.modal-overlay {
+  animation: modal-fade 0.2s ease-out;
+}
+.toast {
+  animation: toast-in 0.3s var(--ease-out);
+}
+
+/* Basma geri bildirimi */
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+  transition-duration: 0.08s;
+}
+.dock-item:active,
+.dock-instance:active {
+  transform: scale(0.94);
+  transition-duration: 0.08s;
+}
+.chip,
+.tab,
+.btn,
+.dock-item,
+.dock-instance {
+  transition-property: background-color, color, border-color, transform;
+  transition-duration: var(--t-fast);
+}
+
+/* Çalışıyor göstergesi: box-shadow yerine transform/opacity halkası */
+.dock-live {
+  background: var(--success);
+  animation: none;
+}
+.dock-live::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: live-ring 2s ease-out infinite;
+}
+@keyframes live-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.app.perf .dock-live::after {
+  display: none;
+}
+
+/* Tema geçişinde yalnızca renkler */
+.theme-switching,
+.theme-switching * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}
+
+/* iOS tarzı anahtar */
+.switch.on {
+  background: var(--success);
+}
+.switch-knob {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* Form alanları: Apple tarzı odak halkası */
+.input {
+  background: var(--cloud-raised);
+  border-radius: 10px;
+}
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-wash);
+}
+
+/* Pencere düğmeleri: Windows 11 gibi */
+.win-btn {
+  border-radius: 8px;
+}
+.win-btn.close:hover {
+  background: #e5484d;
+  color: #fff;
+}
+
+/* Haber kartları: hafif kalkış, gölge animasyonu yok */
+.news-card {
+  border-radius: 16px;
+  transition: transform var(--t-base) var(--ease-out), border-color var(--t-base) var(--ease-out);
+}
+.news-card:hover {
+  transform: translateY(-2px);
+  box-shadow: none;
+  border-color: var(--line-strong);
+}
+
+/* Konsol: gerçek terminal hissi, ekran dışı satırlar çizilmez */
+.console {
+  background: #0c0c10;
+  border-radius: 18px;
+  box-shadow: none;
+  contain: layout paint style;
+}
+.log-line {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 21px;
+}
+
+/* Minecraft dokusu: hero kartında sağa doğru solan blok ızgarası (statik, ucuz) */
+.instance-hero {
+  position: relative;
+  isolation: isolate;
+}
+.instance-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 20px 20px;
+  -webkit-mask-image: linear-gradient(100deg, transparent 38%, #000 100%);
+  mask-image: linear-gradient(100deg, transparent 38%, #000 100%);
+}
+.instance-icon-wrap {
+  border-radius: 22px;
+}
+
+/* Sayılar sabit genişlikte, kaydırma sınırda durur */
+.stat-value,
+.instance-stat-value,
+.progress-text {
+  font-variant-numeric: tabular-nums;
+}
+.main {
+  overscroll-behavior: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

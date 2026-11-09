@@ -1,6 +1,6 @@
 {
   "name": "modlum-launcher",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Modlum Launcher - Minecraft baslatici",
   "main": "./out/main/index.js",
   "author": "Modlum",

@@ -47,7 +47,7 @@ export function Sidebar({
             aria-label={item.label}
             onClick={() => onNavigate(item.id)}
           >
-            <Icon name={item.icon} size={23} />
+            <Icon name={item.icon} size={27} />
             {item.id === 'console' && running && <span className="dock-live" />}
           </button>
         ))}
@@ -64,12 +64,12 @@ export function Sidebar({
             aria-label={instance.name}
             onClick={() => onSelectInstance(instance.id)}
           >
-            <InstanceIcon icon={instance.icon} size={38} />
+            <InstanceIcon icon={instance.icon} size={42} />
             {instance.id === activeInstanceId && <span className="dock-instance-dot" />}
           </button>
         ))}
         <button className="dock-instance dock-add" data-label="Yeni instance" aria-label="Yeni instance" onClick={onCreateInstance}>
-          <Icon name="plus" size={20} />
+          <Icon name="plus" size={24} />
         </button>
       </div>
 
@@ -81,7 +81,7 @@ export function Sidebar({
         aria-label="Hesap"
         onClick={() => onNavigate('accounts')}
       >
-        <Avatar name={account?.username} size={40} variant={account?.type === 'microsoft' ? 'ms' : 'pink'} />
+        <Avatar name={account?.username} size={44} variant={account?.type === 'microsoft' ? 'ms' : 'pink'} />
         {running && <span className="dock-live" />}
       </button>
     </aside>

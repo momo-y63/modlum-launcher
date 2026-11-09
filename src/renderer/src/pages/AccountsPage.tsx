@@ -223,10 +223,10 @@ export function AccountsPage({
             {msState === 'error' && msError && (
               <div
                 className="card"
-                style={{ marginBottom: 14, borderColor: 'rgba(212,80,124,.35)', background: 'var(--pink-soft)' }}
+                style={{ marginBottom: 14, borderColor: 'rgba(255,122,26,.35)', background: 'var(--warm-soft)' }}
               >
                 <div className="row" style={{ gap: 10 }}>
-                  <span style={{ color: 'var(--pink-deep)', display: 'grid', placeItems: 'center' }}>
+                  <span style={{ color: 'var(--warm-deep)', display: 'grid', placeItems: 'center' }}>
                     <Icon name="alert" size={17} />
                   </span>
                   <span className="tiny">{msError}</span>

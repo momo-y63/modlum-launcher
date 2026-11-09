@@ -116,7 +116,7 @@ export function SettingsPage({
               />
               <div className="row between tiny muted" style={{ marginTop: 8 }}>
                 <span>1 GB</span>
-                <strong style={{ color: 'var(--lagoon-deep)' }}>
+                <strong style={{ color: 'var(--accent-deep)' }}>
                   {formatBytes(settings.memoryMb * 1024 * 1024)}
                 </strong>
                 <span>16 GB</span>

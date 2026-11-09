@@ -8,8 +8,8 @@ export interface Toast {
 }
 
 const ICON_COLOR: Record<Toast['kind'], string> = {
-  success: 'var(--lagoon)',
-  error: 'var(--pink-deep)',
+  success: 'var(--accent)',
+  error: 'var(--warm-deep)',
   info: 'var(--ink-soft)'
 }
 

@@ -197,10 +197,10 @@ export function HomePage({
       </section>
 
       {!account && (
-        <div className="card veil" style={{ marginTop: 16, borderColor: 'rgba(240,123,164,.35)' }}>
+        <div className="card veil" style={{ marginTop: 16, borderColor: 'rgba(255,122,26,.35)' }}>
           <div className="row between" style={{ flexWrap: 'wrap', gap: 12 }}>
             <div className="row" style={{ gap: 10 }}>
-              <span style={{ color: 'var(--pink-deep)' }}>
+              <span style={{ color: 'var(--warm-deep)' }}>
                 <Icon name="alert" size={18} />
               </span>
               <span className="setting-desc">Oynamak için önce bir hesap eklemelisin.</span>

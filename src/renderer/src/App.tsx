@@ -41,6 +41,8 @@ export default function App(): React.JSX.Element {
   const [progress, setProgress] = useState<InstallProgress | null>(null)
   const [launch, setLaunch] = useState<LaunchState>({ running: false })
   const [logs, setLogs] = useState<LogLine[]>([])
+  const logBuffer = useRef<LogLine[]>([])
+  const logTimer = useRef<number | null>(null)
   const [toasts, setToasts] = useState<Toast[]>([])
   const [busy, setBusy] = useState<string | null>(null)
   const [javaInfo, setJavaInfo] = useState<JavaState | null>(null)
@@ -147,7 +149,18 @@ export default function App(): React.JSX.Element {
           })
         }
       }),
-      api.on.logLine((line) => setLogs((prev) => [...prev.slice(-2000), line])),
+      api.on.logLine((line) => {
+        // Satırları biriktirip 200 ms'de bir tek seferde işle (her satırda tüm arayüz yeniden çizilmesin)
+        logBuffer.current.push(line)
+        if (logTimer.current === null) {
+          logTimer.current = window.setTimeout(() => {
+            logTimer.current = null
+            const batch = logBuffer.current
+            logBuffer.current = []
+            setLogs((prev) => [...prev, ...batch].slice(-2000))
+          }, 200)
+        }
+      }),
       api.on.msDevice((device) => setMsDevice(device)),
       api.on.msResult(async (result) => {
         if (result.ok) {
@@ -161,7 +174,11 @@ export default function App(): React.JSX.Element {
         }
       })
     ]
-    return () => offs.forEach((off) => off())
+    return () => {
+      offs.forEach((off) => off())
+      if (logTimer.current !== null) window.clearTimeout(logTimer.current)
+      logTimer.current = null
+    }
   }, [refreshContent, refreshSettings, toast])
 
   useEffect(() => {

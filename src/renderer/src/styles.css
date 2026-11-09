@@ -147,16 +147,6 @@ button {
     var(--cloud);
 }
 
-/* ince kağıt dokusu */
-.app::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 50;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-}
 
 /* ---------- Title bar ---------- */
 .titlebar {
@@ -241,8 +231,6 @@ button {
   background: var(--cloud-veil);
   border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(18, 51, 59, 0.04);
-  backdrop-filter: blur(18px) saturate(120%);
-  -webkit-backdrop-filter: blur(18px) saturate(120%);
 }
 
 .brand {
@@ -573,9 +561,7 @@ button {
   box-shadow: none;
 }
 .card.veil {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.78);
 }
 .card.ghost {
   background: transparent;
@@ -1368,7 +1354,6 @@ input[type='range']::-webkit-slider-thumb:hover {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.94);
   box-shadow: var(--shadow-md);
-  backdrop-filter: blur(12px);
   animation: toast-in 0.26s var(--ease);
 }
 @keyframes toast-in {
@@ -2191,9 +2176,6 @@ input[type='range']::-webkit-slider-thumb:hover {
 .app.perf .titlebar-dot {
   animation: none !important;
 }
-.app.perf::after {
-  display: none;
-}
 .app.perf .dock,
 .app.perf .card.veil,
 .app.perf .toast,
@@ -2952,8 +2934,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   z-index: 250;
   display: grid;
   place-items: center;
-  background: rgba(6, 26, 31, 0.55);
-  backdrop-filter: blur(6px);
+  background: rgba(6, 26, 31, 0.64);
   animation: modal-fade 0.2s var(--ease);
 }
 @keyframes modal-fade {
@@ -3436,12 +3417,10 @@ input[type='range']::-webkit-slider-thumb:hover {
   from {
     opacity: 0;
     transform: translateY(16px) scale(0.994);
-    filter: blur(2px);
   }
   to {
     opacity: 1;
     transform: none;
-    filter: blur(0);
   }
 }
 
@@ -3469,15 +3448,6 @@ input[type='range']::-webkit-slider-thumb:hover {
 
 .progress-fill {
   transition: width 0.42s var(--ease);
-}
-
-.dock-item,
-.dock-instance,
-.news-card,
-.content-row,
-.quick-item,
-.file-card {
-  will-change: transform;
 }
 
 /* Tema değişiminde yumuşak geçiş (yalnızca geçiş anında) */

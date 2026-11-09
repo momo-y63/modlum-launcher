@@ -18,9 +18,11 @@ export function ConsolePage({ logs, running, onClear }: Props): React.JSX.Elemen
     if (autoScroll && ref.current) ref.current.scrollTop = ref.current.scrollHeight
   }, [logs, autoScroll])
 
-  const visible = filter.trim()
+  const matched = filter.trim()
     ? logs.filter((line) => line.text.toLowerCase().includes(filter.trim().toLowerCase()))
     : logs
+  // DOM'u şişirmemek için yalnızca son 800 satırı çiz
+  const visible = matched.length > 800 ? matched.slice(-800) : matched
 
   return (
     <>

@@ -49,12 +49,29 @@ jobs:
           path: dist/*.exe
           if-no-files-found: error
 
-      - name: Attach installer to release
+      - name: Publish release with installer
         if: startsWith(github.ref, 'refs/tags/') || inputs.release_tag != ''
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ inputs.release_tag }}"
           if [ -z "$TAG" ]; then TAG="${GITHUB_REF_NAME}"; fi
+
+          # Release yoksa taslak olarak oluştur; installer yüklendikten sonra yayınla.
+          CREATED=0
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            NOTES="docs/releases/${TAG}.md"
+            if [ -f "$NOTES" ]; then
+              gh release create "$TAG" --draft --title "Modlum Launcher ${TAG#v}" --notes-file "$NOTES"
+            else
+              gh release create "$TAG" --draft --title "Modlum Launcher ${TAG#v}" --generate-notes
+            fi
+            CREATED=1
+          fi
+
           gh release upload "$TAG" dist/*.exe --clobber
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          if [ "$CREATED" = "1" ]; then
+            gh release edit "$TAG" --draft=false
+          fi

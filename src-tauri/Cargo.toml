@@ -43,6 +43,7 @@ rfd = "0.15"
 dirs = "5"
 uuid = { version = "1", features = ["v4"] }
 urlencoding = "2"
+base64 = "0.22"
 
 # Spotify paneli Windows medya oturumunu (SMTC) okur.
 [target.'cfg(windows)'.dependencies]

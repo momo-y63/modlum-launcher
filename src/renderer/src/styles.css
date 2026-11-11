@@ -61,19 +61,26 @@
   --muted: #6e6e76;
   --muted-2: #98989f;
 
-  --line: rgba(0, 0, 0, 0.08);
-  --line-strong: rgba(0, 0, 0, 0.16);
+  /* Saç teli kenarlar: düz 1px gri çizgi yerine düşük opaklık */
+  --line: rgba(18, 18, 24, 0.055);
+  --line-strong: rgba(18, 18, 24, 0.12);
+  --hairline: rgba(18, 18, 24, 0.055);
 
-  --radius: 20px;
-  --radius-sm: 12px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.14);
+  --radius: 24px;
+  --radius-sm: 14px;
+
+  /* Ambient gölgeler: geniş yayılım, düşük opaklık, iki katman */
+  --shadow-sm: 0 1px 1px rgba(16, 16, 24, 0.02), 0 12px 32px -20px rgba(16, 16, 24, 0.18);
+  --shadow-md: 0 2px 4px rgba(16, 16, 24, 0.03), 0 26px 64px -30px rgba(16, 16, 24, 0.22);
+  --shadow-lg: 0 44px 120px -44px rgba(16, 16, 24, 0.32);
 
   --font-ui: 'Plus Jakarta Sans', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
-  --font-display: var(--font-ui);
+  --font-display: 'Fraunces', 'Plus Jakarta Sans', Georgia, serif;
 
+  /* Sinematik yumuşak hareket eğrileri */
   --ease: cubic-bezier(0.22, 0.68, 0.32, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-glide: cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 * {
@@ -834,7 +841,7 @@ button {
   display: grid;
   place-items: center;
   color: #fff;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-lg);
 }
 .art-core span {
   font-family: var(--font-display);
@@ -1258,7 +1265,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   height: 20px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(16, 16, 24, 0.1);
   transition: transform 0.22s var(--ease);
 }
 .switch.on .switch-knob {
@@ -1527,7 +1534,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   border-radius: 50%;
   background: var(--warm);
   border: 2px solid var(--cloud);
-  animation: live-pulse 2.4s ease-in-out infinite;
+  animation: live-pulse 2.4s var(--ease-glide) infinite;
 }
 @keyframes live-pulse {
   0%,
@@ -1583,7 +1590,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   padding: 7px 12px;
   border-radius: 10px;
   white-space: nowrap;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow-md);
   transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
   z-index: 60;
 }
@@ -1672,7 +1679,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   background: #fff;
   border-radius: 20px;
   padding: 16px 18px 18px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--shadow-lg);
   z-index: 4;
 }
 .speech-name {
@@ -1730,7 +1737,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   filter: drop-shadow(0 22px 36px rgba(0, 0, 0, 0.28));
 }
 .guide-float {
-  animation: guide-float 5.2s ease-in-out infinite;
+  animation: guide-float 5.2s var(--ease-glide) infinite;
 }
 @keyframes guide-float {
   0%,
@@ -1760,7 +1767,7 @@ input[type='range']::-webkit-slider-thumb:hover {
 .guide .arm-wave {
   transform-box: view-box;
   transform-origin: 176px 218px;
-  animation: wave 3.4s ease-in-out infinite;
+  animation: wave 3.4s var(--ease-glide) infinite;
 }
 @keyframes wave {
   0%,
@@ -1774,7 +1781,7 @@ input[type='range']::-webkit-slider-thumb:hover {
 .guide-sparkle {
   transform-box: fill-box;
   transform-origin: center;
-  animation: twinkle 3.4s ease-in-out infinite;
+  animation: twinkle 3.4s var(--ease-glide) infinite;
 }
 .guide-sparkle.late {
   animation-delay: 1.4s;
@@ -2207,7 +2214,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   max-width: 100%;
   object-fit: contain;
   transform-origin: 50% 100%;
-  animation: guide-breathe 5.6s ease-in-out infinite;
+  animation: guide-breathe 5.6s var(--ease-glide) infinite;
   filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.32));
   user-select: none;
   -webkit-user-drag: none;
@@ -2229,7 +2236,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   height: 26px;
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(0, 0, 0, 0.32), transparent);
-  animation: shadow-breathe 5.6s ease-in-out infinite;
+  animation: shadow-breathe 5.6s var(--ease-glide) infinite;
 }
 @keyframes shadow-breathe {
   0%,
@@ -2352,7 +2359,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   inset: -7px;
   border-radius: 28px;
   border: 2px solid rgba(255, 122, 26, 0.45);
-  animation: hole-pulse 2.6s ease-in-out infinite;
+  animation: hole-pulse 2.6s var(--ease-glide) infinite;
 }
 @keyframes hole-pulse {
   0%,
@@ -2372,7 +2379,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   background: #fff;
   border-radius: 20px;
   padding: 16px 18px;
-  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.42);
+  box-shadow: var(--shadow-lg);
   animation: tip-in 0.26s var(--ease);
   transition: left 0.5s var(--ease), top 0.5s var(--ease);
   will-change: left, top;
@@ -2506,7 +2513,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   object-fit: contain;
   object-position: bottom;
   align-self: end;
-  animation: guide-breathe 6.4s ease-in-out infinite;
+  animation: guide-breathe 6.4s var(--ease-glide) infinite;
   transform-origin: 50% 100%;
   filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.18));
   -webkit-mask-image: linear-gradient(to bottom, #000 86%, transparent 100%);
@@ -2707,7 +2714,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   padding: 7px 12px;
   border-radius: 10px;
   white-space: nowrap;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow-md);
   transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
   z-index: 60;
 }
@@ -3759,7 +3766,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   background: var(--success);
 }
 .switch-knob {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(16, 16, 24, 0.1);
 }
 
 /* Form alanları: Apple tarzı odak halkası */
@@ -3941,7 +3948,7 @@ input[type='range']::-webkit-slider-thumb:hover {
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent), var(--warm));
-  transition: width 0.35s linear;
+  transition: width 0.45s var(--ease-out);
 }
 .np-times {
   display: flex;

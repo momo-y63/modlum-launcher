@@ -224,7 +224,7 @@ export function Icon({
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.65}
+      strokeWidth={1.35}
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}

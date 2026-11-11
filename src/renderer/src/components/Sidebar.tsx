@@ -9,9 +9,9 @@ export type Page = 'home' | 'spotify' | 'accounts' | 'settings' | 'console' | 'i
 const NAV: { id: Page; label: string; icon: string }[] = [
   { id: 'home', label: 'Oyun', icon: 'home' },
   { id: 'spotify', label: 'Spotify', icon: 'music' },
-  { id: 'settings', label: 'Ayarlar', icon: 'settings' },
   { id: 'console', label: 'Konsol', icon: 'terminal' },
-  { id: 'info', label: 'Bilgi', icon: 'info' }
+  { id: 'info', label: 'Bilgi', icon: 'info' },
+  { id: 'settings', label: 'Ayarlar', icon: 'settings' }
 ]
 
 export function Sidebar({

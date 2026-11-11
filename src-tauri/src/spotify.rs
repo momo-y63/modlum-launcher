@@ -93,6 +93,7 @@ mod imp {
     use windows::Media::Control::{
         GlobalSystemMediaTransportControlsSession,
         GlobalSystemMediaTransportControlsSessionManager,
+        GlobalSystemMediaTransportControlsSessionMediaProperties,
         GlobalSystemMediaTransportControlsSessionPlaybackStatus,
     };
 
@@ -116,6 +117,44 @@ mod imp {
             }
         }
         None
+    }
+
+    fn artwork_mime(bytes: &[u8]) -> &'static str {
+        if bytes.starts_with(&[0x89, b'P', b'N', b'G']) {
+            "image/png"
+        } else if bytes.starts_with(&[0xFF, 0xD8]) {
+            "image/jpeg"
+        } else if bytes.len() > 12 && &bytes[8..12] == b"WEBP" {
+            "image/webp"
+        } else {
+            "image/png"
+        }
+    }
+
+    /// SMTC oturumunun thumbnail akisini data URL'e cevirir (album kapagi).
+    fn artwork_data_url(
+        props: &GlobalSystemMediaTransportControlsSessionMediaProperties,
+    ) -> Option<String> {
+        use base64::Engine;
+        use windows::core::Interface;
+        use windows::Storage::Streams::{DataReader, IInputStream};
+
+        let reference = props.Thumbnail().ok()?;
+        let stream = reference.OpenReadAsync().ok()?.get().ok()?;
+        let size = stream.Size().ok()?;
+        if size == 0 || size > 6 * 1024 * 1024 {
+            return None;
+        }
+        let input: IInputStream = stream.cast().ok()?;
+        let reader = DataReader::CreateDataReader(&input).ok()?;
+        reader.LoadAsync(size as u32).ok()?.get().ok()?;
+        let mut buffer = vec![0u8; size as usize];
+        reader.ReadBytes(&mut buffer).ok()?;
+        Some(format!(
+            "data:{};base64,{}",
+            artwork_mime(&buffer),
+            base64::engine::general_purpose::STANDARD.encode(&buffer)
+        ))
     }
 
     pub fn now_playing() -> NowPlaying {
@@ -150,7 +189,7 @@ mod imp {
             .unwrap_or((0, 0));
 
         let properties = session.TryGetMediaPropertiesAsync().ok().and_then(|op| op.get().ok());
-        let (title, artist, album) = match &properties {
+        let (title, artist, album, artwork) = match &properties {
             Some(props) => (
                 props.Title().map(|value| value.to_string()).unwrap_or_default(),
                 props.Artist().map(|value| value.to_string()).unwrap_or_default(),
@@ -158,8 +197,9 @@ mod imp {
                     .AlbumTitle()
                     .map(|value| value.to_string())
                     .unwrap_or_default(),
+                artwork_data_url(props),
             ),
-            None => (String::new(), String::new(), String::new()),
+            None => (String::new(), String::new(), String::new(), None),
         };
 
         if title.trim().is_empty() {
@@ -179,7 +219,7 @@ mod imp {
             name: title,
             artists: artist,
             album,
-            image: None,
+            image: artwork,
             duration_ms,
             url: None,
         };

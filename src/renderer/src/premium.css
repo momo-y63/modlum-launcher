@@ -1,0 +1,253 @@
+/* =====================================================================
+   PREMIUM KATMAN — Vanguard UI
+   Açık tema: Soft Structuralism (gümüş-beyaz zemin, karakterli serif
+   başlıklar, havada süzülen kartlar). Koyu tema: Ethereal Glass (derin
+   siyah, ışıyan mesh, statik cam yüzeyler).
+   Düz 1px gri kenar ve sert koyu gölge yok; yalnızca hairline + geniş
+   yayılımlı, düşük opaklıkta ambient gölge.
+   Hareket: DESIGN.md ile uyumlu — sadece transform/opacity, gölge ve
+   backdrop-filter animasyonu yok, süreler ≤ 0.4s, easing --ease-out.
+   ===================================================================== */
+
+:root[data-theme='dark'] {
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --hairline: rgba(255, 255, 255, 0.09);
+  --shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.35), 0 24px 60px -34px rgba(0, 0, 0, 0.85);
+  --shadow-md: 0 36px 90px -44px rgba(0, 0, 0, 0.9);
+  --shadow-lg: 0 70px 160px -60px rgba(0, 0, 0, 0.95);
+}
+
+/* --- Yüzeyler: hairline + sabit ambient gölge ------------------------- */
+.card,
+.file-card,
+.quick-item,
+.news-card,
+.instance-hero,
+.modal,
+.toast,
+.dock {
+  border-color: var(--hairline);
+  box-shadow: var(--shadow-sm);
+}
+
+.card.ghost,
+.card.veil {
+  box-shadow: none;
+}
+
+/* Koyu tema: cam yüzey, ışıyan iç kenar (statik, animasyonsuz) */
+:root[data-theme='dark'] .card,
+:root[data-theme='dark'] .file-card,
+:root[data-theme='dark'] .news-card,
+:root[data-theme='dark'] .quick-item {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(22px) saturate(1.15);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+}
+
+/* Yalnızca tıklanabilir kartlar havalanır; gölge animasyonu yok */
+.file-card,
+.quick-item,
+.news-card {
+  transition: transform 0.24s var(--ease-out);
+}
+
+.file-card:hover,
+.quick-item:hover,
+.news-card:hover {
+  transform: translateY(-2px);
+}
+
+/* --- Tipografi: karakterli serif başlıklar ---------------------------- */
+.page-title,
+.news-title-main,
+.empty-title,
+.modal-title {
+  font-family: var(--font-display);
+  font-weight: 560;
+  letter-spacing: -0.025em;
+  line-height: 1.03;
+}
+
+.page-title {
+  font-size: clamp(30px, 3.2vw, 40px);
+}
+
+.np-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+}
+
+.eyebrow {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+/* --- Nefes alan düzen ------------------------------------------------- */
+.page {
+  padding-top: 4px;
+}
+
+.page-head {
+  margin-bottom: 26px;
+  gap: 22px;
+  align-items: flex-end;
+}
+
+.settings-stack {
+  gap: 18px;
+}
+
+/* --- Butonlar: hairline, yumuşak yükselme ---------------------------- */
+.btn {
+  border-radius: 14px;
+  transition:
+    transform 0.2s var(--ease-out),
+    background 0.2s var(--ease),
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+  transition-duration: 0.14s;
+}
+
+/* --- Girdiler: odakta statik ambient halka ---------------------------- */
+.input {
+  border-radius: 14px;
+  transition:
+    border-color 0.24s var(--ease),
+    background 0.24s var(--ease);
+}
+
+.input:focus {
+  box-shadow:
+    0 0 0 4px var(--accent-wash),
+    var(--shadow-sm);
+}
+
+/* --- Gezinme --------------------------------------------------------- */
+.tab,
+.dock-item,
+.dock-instance,
+.chip,
+.np-btn {
+  transition:
+    color 0.24s var(--ease),
+    background 0.24s var(--ease),
+    transform 0.24s var(--ease-out);
+}
+
+.tab:hover,
+.dock-item:hover {
+  transform: translateY(-1px);
+}
+
+/* --- Spotify: asimetrik bento, süzülen kapak ------------------------- */
+.spotify-grid {
+  grid-template-columns: minmax(280px, 0.92fr) minmax(320px, 1.08fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.spotify-grid .lyrics-card {
+  margin-top: 26px;
+}
+
+.np-cover {
+  border-radius: 22px;
+  box-shadow: var(--shadow-md);
+  background:
+    radial-gradient(120% 120% at 22% 0%, var(--accent-soft), transparent 62%),
+    linear-gradient(140deg, var(--warm-soft), var(--accent-soft));
+}
+
+.np-cover img {
+  transition: transform 0.34s var(--ease-out);
+}
+
+.np-card:hover .np-cover img {
+  transform: scale(1.03);
+}
+
+.np-btn {
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-sm);
+}
+
+.np-btn.main {
+  border: none;
+  box-shadow: 0 18px 40px -18px rgba(91, 61, 245, 0.55);
+}
+
+.np-bar {
+  height: 5px;
+}
+
+.lyrics-scroll {
+  mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent 100%
+  );
+}
+
+.lyric-line.active {
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Performans modu ve hareket azaltma ------------------------------ */
+.app.perf .file-card,
+.app.perf .quick-item,
+.app.perf .news-card,
+.app.perf .btn,
+.app.perf .tab,
+.app.perf .dock-item,
+.app.perf .np-cover img {
+  transition: none;
+}
+
+.app.perf .file-card:hover,
+.app.perf .quick-item:hover,
+.app.perf .news-card:hover,
+.app.perf .btn:hover:not(:disabled),
+.app.perf .tab:hover,
+.app.perf .dock-item:hover,
+.app.perf .np-card:hover .np-cover img {
+  transform: none;
+}
+
+@media (max-width: 1080px) {
+  .spotify-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spotify-grid .lyrics-card {
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .file-card:hover,
+  .quick-item:hover,
+  .news-card:hover,
+  .btn:hover:not(:disabled),
+  .tab:hover,
+  .dock-item:hover,
+  .np-card:hover .np-cover img {
+    transform: none;
+  }
+}

@@ -3,7 +3,7 @@ import { api } from '../api'
 
 export function TitleBar({ running }: { running: boolean }): React.JSX.Element {
   return (
-    <div className="titlebar">
+    <div className="titlebar" data-tauri-drag-region>
       <div className="titlebar-brand">
         <span className={`titlebar-dot${running ? ' running' : ''}`} />
         <span>{running ? 'Oyun çalışıyor' : 'Modlum Launcher'}</span>

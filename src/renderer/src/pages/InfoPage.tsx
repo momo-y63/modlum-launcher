@@ -170,16 +170,16 @@ export function InfoPage({ appInfo, settings, account, installedCount }: Props):
               <span>{platformLabel(appInfo?.platform)}</span>
             </div>
             <div className="sys-row">
-              <span className="stat-label">Electron</span>
-              <span>{appInfo?.versions?.electron ?? '—'}</span>
+              <span className="stat-label">Tauri</span>
+              <span>{appInfo?.versions?.tauri ?? '—'}</span>
             </div>
             <div className="sys-row">
-              <span className="stat-label">Chromium</span>
-              <span>{appInfo?.versions?.chrome ?? '—'}</span>
+              <span className="stat-label">Rust</span>
+              <span>{appInfo?.versions?.rust ?? '—'}</span>
             </div>
             <div className="sys-row">
-              <span className="stat-label">Node.js</span>
-              <span>{appInfo?.versions?.node ?? '—'}</span>
+              <span className="stat-label">WebView</span>
+              <span>{appInfo?.versions?.webview ?? '—'}</span>
             </div>
             <div className="sys-row">
               <span className="stat-label">Bellek</span>

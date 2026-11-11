@@ -4,8 +4,8 @@
 
 # Modlum Launcher
 
-Windows için modern bir **Minecraft: Java Edition** başlatıcısı. Electron + React + TypeScript ile
-yazıldı; sürüm ve loader kurulumunu, Java'yı ve hesapları kullanıcının yerine halleder.
+Windows için modern bir **Minecraft: Java Edition** başlatıcısı. Çekirdek **Rust (Tauri 2)**,
+arayüz **React + TypeScript**; sürüm ve loader kurulumunu, Java'yı ve hesapları kullanıcının yerine halleder.
 
 ![Ana ekran (koyu tema)](docs/screenshots/home-dark.png)
 
@@ -32,8 +32,8 @@ yazıldı; sürüm ve loader kurulumunu, Java'yı ve hesapları kullanıcının 
 
 ## Gereksinimler
 
-- **Windows 10/11 (x64)**
-- Geliştirme için **Node.js ≥ 20** ve **pnpm**
+- **Windows 10/11 (x64)** ve **WebView2** (Windows 11'de kurulu gelir)
+- Geliştirme için **Node.js ≥ 20**, **pnpm** ve **Rust** ([rustup](https://rustup.rs))
 - Oyun için **Java**: Modern sürümler Java 21+ ister. Launcher eksik sürümü otomatik indirir.
 
 ## Kurulum (kullanıcı)
@@ -45,13 +45,11 @@ Kurulum yönetici izni gerektirmez (per-user NSIS).
 
 ```bash
 pnpm install
-pnpm dev        # electron-vite dev (HMR)
-pnpm build      # üretim derlemesi -> out/
-pnpm typecheck  # tsc --noEmit
-pnpm dist       # Windows kurulum paketi -> dist/
+pnpm tauri dev    # Vite + Tauri geliştirme penceresi (HMR)
+pnpm typecheck    # tsc --noEmit
+pnpm build        # yalnızca arayüz derlemesi -> dist/
+pnpm dist         # Windows kurulum paketi (NSIS)
 ```
-
-> Electron ikilisi indirilmediyse: `node node_modules/electron/install.js`
 
 ## Paketleme
 
@@ -59,7 +57,8 @@ pnpm dist       # Windows kurulum paketi -> dist/
 pnpm dist
 ```
 
-Çıktı: `dist/ModlumLauncher-<sürüm>-Setup.exe` (NSIS, x64).
+Çıktı: `src-tauri/target/release/bundle/nsis/Modlum Launcher_<sürüm>_x64-setup.exe`.
+CI bu dosyayı `ModlumLauncher-<sürüm>-Setup.exe` adıyla release'e ekler.
 
 ## Veri yerleşimi
 
@@ -71,20 +70,25 @@ pnpm dist
 | Java runtime (otomatik) | `%APPDATA%\modlum-launcher\runtime\` |
 
 Her instance klasörü: `mods/`, `saves/`, `screenshots/`, `resourcepacks/`, `shaderpacks/`, `datapacks/`.
-Ortak veri klasörü Ayarlar'dan değiştirilebilir.
+Ortak veri klasörü Ayarlar'dan değiştirilebilir. Ayarlar dosyası Electron sürümüyle aynı biçimde
+tutulduğu için mevcut kurulumlar olduğu gibi çalışmaya devam eder.
 
 ## Proje yapısı
 
 ```
+src-tauri/            Rust çekirdeği (Tauri 2)
+  src/main.rs           windows_subsystem girişi
+  src/lib.rs            Tauri kurulumu ve komut kaydı
+  src/commands.rs       IPC komutları, instance yönetimi, oyun başlatma
+  src/install.rs        Sürüm/kütüphane/asset indirme
+  src/loaders.rs        Fabric, Quilt, Forge, NeoForge kurulumu
+  src/merge.rs          inheritsFrom birleştirme
+  src/launch.rs         Classpath ve JVM/game argümanları
+  src/auth.rs           Microsoft cihaz kodu akışı
+  src/java.rs           Java tespiti + Adoptium indirme
+  src/core_net.rs       HTTP, hash doğrulama, eşzamanlı indirme
+  tauri.conf.json       Pencere + NSIS paketleme ayarları
 src/
-  main/        Electron ana süreç
-    ipc.ts         IPC köprüsü, instance yönetimi, oyun başlatma
-    install.ts     Sürüm/kütüphane/asset indirme
-    loaders.ts     Fabric, Quilt, Forge, NeoForge kurulumu
-    merge.ts       inheritsFrom birleştirme
-    launch.ts      Classpath ve JVM/game argümanları
-    auth/          Microsoft cihaz kodu akışı
-  preload/     contextBridge API
   renderer/    React arayüzü (sayfalar, bileşenler, stiller)
   shared/      Ortak TypeScript tipleri
 ```

@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["node", "electron-vite/node"]
+    "types": ["node", "vite/client"]
   },
-  "include": ["src/**/*", "electron.vite.config.ts"]
+  "include": ["src/renderer/**/*", "src/shared/**/*", "vite.config.ts"]
 }

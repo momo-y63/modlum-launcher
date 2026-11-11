@@ -106,7 +106,7 @@ export interface AppInfo {
   platform: string
   dataDir: string
   defaultGameDir: string
-  versions?: { electron: string; chrome: string; node: string }
+  versions?: { tauri: string; rust: string; webview: string }
 }
 
 export interface InstanceContent {

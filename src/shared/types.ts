@@ -29,6 +29,39 @@ export interface Instance {
   playtimeSeconds: number
 }
 
+export interface SpotifyConnection {
+  refreshToken?: string
+  accessToken?: string
+  expiresAt: number
+  displayName?: string | null
+}
+
+export interface SpotifyTrack {
+  id: string
+  name: string
+  artists: string
+  album: string
+  image: string | null
+  durationMs: number
+  url: string | null
+}
+
+export interface NowPlaying {
+  connected: boolean
+  playing: boolean
+  progressMs: number
+  device: string | null
+  track: SpotifyTrack | null
+  error: string | null
+}
+
+export interface Lyrics {
+  plain: string | null
+  synced: string | null
+  source: string
+  instrumental: boolean
+}
+
 export interface Settings {
   gameDir: string
   javaPath: string
@@ -46,6 +79,8 @@ export interface Settings {
   playtime: Record<string, number>
   instances: Instance[]
   activeInstanceId: string | null
+  spotifyClientId: string
+  spotify: SpotifyConnection
 }
 
 export interface VersionSummary {

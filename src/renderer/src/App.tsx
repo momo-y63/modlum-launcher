@@ -24,6 +24,7 @@ import { AccountsPage } from './pages/AccountsPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { ConsolePage } from './pages/ConsolePage'
 import { InfoPage } from './pages/InfoPage'
+import { SpotifyPage } from './pages/SpotifyPage'
 
 type MsState = 'idle' | 'waiting' | 'success' | 'error'
 
@@ -439,6 +440,14 @@ export default function App(): React.JSX.Element {
                 onStartMicrosoft={() => void handleStartMicrosoft()}
                 onCancelMicrosoft={handleCancelMicrosoft}
                 onNavigate={setPage}
+              />
+            )}
+
+            {page === 'spotify' && (
+              <SpotifyPage
+                settings={settings}
+                onUpdate={updateSettings}
+                onToast={(input) => toast(input)}
               />
             )}
 

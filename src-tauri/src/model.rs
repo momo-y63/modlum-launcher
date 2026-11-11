@@ -42,6 +42,15 @@ pub struct Instance {
     pub playtime_seconds: u64,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[serde(rename_all = "camelCase", default)]
+pub struct SpotifyConnection {
+    pub refresh_token: Option<String>,
+    pub access_token: Option<String>,
+    pub expires_at: u64,
+    pub display_name: Option<String>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
@@ -60,6 +69,8 @@ pub struct Settings {
     pub playtime: HashMap<String, u64>,
     pub instances: Vec<Instance>,
     pub active_instance_id: Option<String>,
+    pub spotify_client_id: String,
+    pub spotify: SpotifyConnection,
 }
 
 impl Default for Settings {
@@ -80,6 +91,8 @@ impl Default for Settings {
             playtime: HashMap::new(),
             instances: Vec::new(),
             active_instance_id: None,
+            spotify_client_id: String::new(),
+            spotify: SpotifyConnection::default(),
         }
     }
 }

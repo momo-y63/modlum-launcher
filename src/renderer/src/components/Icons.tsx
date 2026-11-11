@@ -173,6 +173,38 @@ const paths: Record<string, ReactNode> = {
       <path d="m4.4 10.4 7.6-6.2 7.6 6.2" />
       <path d="M6.4 9.2v9.1c0 .8.7 1.5 1.5 1.5h8.2c.8 0 1.5-.7 1.5-1.5V9.2" />
     </>
+  ),
+  music: (
+    <>
+      <circle cx="7.4" cy="17.2" r="2.6" />
+      <circle cx="17.4" cy="15" r="2.6" />
+      <path d="M10 17.2V7.6l9.4-2.2V15" />
+    </>
+  ),
+  pause: (
+    <>
+      <rect x="8" y="6.4" width="2.6" height="11.2" rx="1.1" fill="currentColor" stroke="none" />
+      <rect x="13.4" y="6.4" width="2.6" height="11.2" rx="1.1" fill="currentColor" stroke="none" />
+    </>
+  ),
+  skipBack: (
+    <>
+      <path d="M7.2 6.2v11.6" />
+      <path d="M18.2 6.9c0-.8-.9-1.3-1.6-.9l-7.4 4.6c-.6.4-.6 1.3 0 1.7l7.4 4.6c.7.4 1.6-.1 1.6-.9V6.9z" fill="currentColor" stroke="none" />
+    </>
+  ),
+  skipForward: (
+    <>
+      <path d="M16.8 6.2v11.6" />
+      <path d="M5.8 6.9c0-.8.9-1.3 1.6-.9l7.4 4.6c.6.4.6 1.3 0 1.7l-7.4 4.6c-.7.4-1.6-.1-1.6-.9V6.9z" fill="currentColor" stroke="none" />
+    </>
+  ),
+  quote: (
+    <>
+      <path d="M5.4 11.4h4.2v4.6c0 .7-.6 1.3-1.3 1.3H6.7c-.7 0-1.3-.6-1.3-1.3v-4.6z" />
+      <path d="M14.4 11.4h4.2v4.6c0 .7-.6 1.3-1.3 1.3h-1.6c-.7 0-1.3-.6-1.3-1.3v-4.6z" />
+      <path d="M5.4 11.4c0-3 1.4-5 4-5.8M14.4 11.4c0-3 1.4-5 4-5.8" opacity=".6" />
+    </>
   )
 }
 

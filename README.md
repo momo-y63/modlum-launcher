@@ -24,6 +24,7 @@ arayüz **React + TypeScript**; sürüm ve loader kurulumunu, Java'yı ve hesapl
 - **Performans modu** — animasyonları, bulanıklığı ve saydamlık efektlerini kapatır.
 - **İçerik yönetimi** — modları aç/kapat, sil; resource pack, shader, datapack ve dünya klasörlerine erişim.
 - **Mojang haber akışı**, oyun süresi takibi, gerçek oyuncu avatarları ve RAM hazır ayarları.
+- **Spotify paneli** — arka planda çalan şarkıyı gör, parça değiştir, oynat/duraklat ve senkron sözleri takip et.
 - **Türkçe arayüz**, açık kaynak ve MIT lisanslı.
 
 | Kurulum turu | Bilgi / lisanslar |
@@ -85,6 +86,7 @@ src-tauri/            Rust çekirdeği (Tauri 2)
   src/merge.rs          inheritsFrom birleştirme
   src/launch.rs         Classpath ve JVM/game argümanları
   src/auth.rs           Microsoft cihaz kodu akışı
+  src/spotify.rs        Spotify OAuth (PKCE), çalma kontrolü, sözler
   src/java.rs           Java tespiti + Adoptium indirme
   src/core_net.rs       HTTP, hash doğrulama, eşzamanlı indirme
   tauri.conf.json       Pencere + NSIS paketleme ayarları

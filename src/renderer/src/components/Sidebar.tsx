@@ -4,10 +4,11 @@ import { Avatar } from './Avatar'
 import { InstanceIcon } from './InstanceIcon'
 import brandIcon from '../assets/brand/momo-icon.png'
 
-export type Page = 'home' | 'accounts' | 'settings' | 'console' | 'info'
+export type Page = 'home' | 'spotify' | 'accounts' | 'settings' | 'console' | 'info'
 
 const NAV: { id: Page; label: string; icon: string }[] = [
   { id: 'home', label: 'Oyun', icon: 'home' },
+  { id: 'spotify', label: 'Spotify', icon: 'music' },
   { id: 'settings', label: 'Ayarlar', icon: 'settings' },
   { id: 'console', label: 'Konsol', icon: 'terminal' },
   { id: 'info', label: 'Bilgi', icon: 'info' }

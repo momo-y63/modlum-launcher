@@ -12,8 +12,11 @@ import type {
   LaunchState,
   Loader,
   LogLine,
+  Lyrics,
   NewsItem,
+  NowPlaying,
   Settings,
+  SpotifyConnection,
   VersionSummary
 } from '../../shared/types'
 
@@ -36,7 +39,8 @@ export const api = {
   },
   shell: {
     openFolder: (sub?: string): Promise<void> => call('open_folder', { sub }),
-    openPath: (target: string): Promise<void> => call('open_path', { target })
+    openPath: (target: string): Promise<void> => call('open_path', { target }),
+    openUrl: (url: string): Promise<void> => call('open_url', { url })
   },
   versions: {
     list: (): Promise<{ versions: VersionSummary[]; installed: InstalledVersion[] }> =>
@@ -80,6 +84,20 @@ export const api = {
   },
   news: {
     list: (): Promise<NewsItem[]> => call('news_list')
+  },
+  spotify: {
+    login: (): Promise<SpotifyConnection> => call('spotify_login'),
+    logout: (): Promise<boolean> => call('spotify_logout'),
+    status: (): Promise<NowPlaying> => call('spotify_status'),
+    control: (action: string, positionMs?: number): Promise<boolean> =>
+      call('spotify_control', { action, positionMs }),
+    lyrics: (input: { artist: string; title: string; album: string; durationMs: number }): Promise<Lyrics> =>
+      call('spotify_lyrics', {
+        artist: input.artist,
+        title: input.title,
+        album: input.album,
+        durationMs: input.durationMs
+      })
   },
   on: {
     installProgress: (cb: (progress: InstallProgress) => void) => subscribe('install:progress', cb),

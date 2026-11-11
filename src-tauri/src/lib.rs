@@ -11,6 +11,7 @@ mod merge;
 mod model;
 mod mojang;
 mod paths;
+mod spotify;
 mod state;
 mod store;
 
@@ -36,6 +37,7 @@ pub fn run() {
             commands::pick_folder,
             commands::open_folder,
             commands::open_path,
+            commands::open_url,
             commands::versions_list,
             commands::instances_list,
             commands::instances_create,
@@ -57,6 +59,11 @@ pub fn run() {
             commands::logs_get,
             commands::logs_clear,
             commands::news_list,
+            commands::spotify_login,
+            commands::spotify_logout,
+            commands::spotify_status,
+            commands::spotify_control,
+            commands::spotify_lyrics,
         ])
         .run(tauri::generate_context!())
         .expect("Modlum Launcher başlatılamadı");

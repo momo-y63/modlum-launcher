@@ -806,6 +806,9 @@ pub fn settings_set(state: State<'_, AppState>, patch: Value) -> Settings {
         if let Some(value) = patch.get("microsoftClientId").and_then(|value| value.as_str()) {
             settings.microsoft_client_id = value.trim().to_string();
         }
+        if let Some(value) = patch.get("spotifyClientId").and_then(|value| value.as_str()) {
+            settings.spotify_client_id = value.trim().to_string();
+        }
         if let Some(value) = patch.get("keepLauncherOpen").and_then(|value| value.as_bool()) {
             settings.keep_launcher_open = value;
         }
@@ -865,6 +868,14 @@ pub fn open_path(state: State<'_, AppState>, target: String) -> CmdResult<()> {
     }
     let _ = std::fs::create_dir_all(&target);
     opener::open(&target).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn open_url(url: String) -> CmdResult<()> {
+    if !url.starts_with("https://") {
+        return Err("Yalnızca https bağlantıları açılabilir.".to_string());
+    }
+    opener::open(&url).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -1271,6 +1282,74 @@ pub fn logs_get(state: State<'_, AppState>) -> Vec<LogLine> {
 pub fn logs_clear(state: State<'_, AppState>) -> CmdResult<bool> {
     state.clear_logs();
     Ok(true)
+}
+
+#[tauri::command]
+pub async fn spotify_login(state: State<'_, AppState>) -> CmdResult<SpotifyConnection> {
+    let settings = state.settings();
+    let connection = crate::spotify::login(&settings.spotify_client_id).await?;
+    let saved = connection.clone();
+    state.update(|settings| settings.spotify = saved);
+    Ok(connection)
+}
+
+#[tauri::command]
+pub fn spotify_logout(state: State<'_, AppState>) -> CmdResult<bool> {
+    state.update(|settings| settings.spotify = SpotifyConnection::default());
+    Ok(true)
+}
+
+#[tauri::command]
+pub async fn spotify_status(
+    state: State<'_, AppState>,
+) -> CmdResult<crate::spotify::NowPlaying> {
+    let settings = state.settings();
+    let mut connection = settings.spotify.clone();
+    if connection.refresh_token.is_none() {
+        return Ok(crate::spotify::NowPlaying::disconnected());
+    }
+    let result = crate::spotify::now_playing(&mut connection, &settings.spotify_client_id).await?;
+    if connection.access_token != settings.spotify.access_token
+        || connection.expires_at != settings.spotify.expires_at
+    {
+        let saved = connection.clone();
+        state.update(|settings| settings.spotify = saved);
+    }
+    Ok(result)
+}
+
+#[tauri::command]
+pub async fn spotify_control(
+    state: State<'_, AppState>,
+    action: String,
+    position_ms: Option<u64>,
+) -> CmdResult<bool> {
+    let settings = state.settings();
+    let mut connection = settings.spotify.clone();
+    crate::spotify::control(
+        &mut connection,
+        &settings.spotify_client_id,
+        &action,
+        position_ms,
+    )
+    .await?;
+    if connection.access_token != settings.spotify.access_token
+        || connection.expires_at != settings.spotify.expires_at
+    {
+        let saved = connection.clone();
+        state.update(|settings| settings.spotify = saved);
+    }
+    Ok(true)
+}
+
+#[tauri::command]
+pub async fn spotify_lyrics(
+    artist: String,
+    title: String,
+    album: String,
+    duration_ms: u64,
+) -> CmdResult<crate::spotify::Lyrics> {
+    crate::spotify::lyrics(&artist, &title, &album, duration_ms).await
 }
 
 #[tauri::command]

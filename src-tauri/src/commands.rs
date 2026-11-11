@@ -806,9 +806,6 @@ pub fn settings_set(state: State<'_, AppState>, patch: Value) -> Settings {
         if let Some(value) = patch.get("microsoftClientId").and_then(|value| value.as_str()) {
             settings.microsoft_client_id = value.trim().to_string();
         }
-        if let Some(value) = patch.get("spotifyClientId").and_then(|value| value.as_str()) {
-            settings.spotify_client_id = value.trim().to_string();
-        }
         if let Some(value) = patch.get("keepLauncherOpen").and_then(|value| value.as_bool()) {
             settings.keep_launcher_open = value;
         }
@@ -1285,60 +1282,13 @@ pub fn logs_clear(state: State<'_, AppState>) -> CmdResult<bool> {
 }
 
 #[tauri::command]
-pub async fn spotify_login(state: State<'_, AppState>) -> CmdResult<SpotifyConnection> {
-    let settings = state.settings();
-    let connection = crate::spotify::login(&settings.spotify_client_id).await?;
-    let saved = connection.clone();
-    state.update(|settings| settings.spotify = saved);
-    Ok(connection)
+pub fn spotify_status() -> crate::spotify::NowPlaying {
+    crate::spotify::now_playing()
 }
 
 #[tauri::command]
-pub fn spotify_logout(state: State<'_, AppState>) -> CmdResult<bool> {
-    state.update(|settings| settings.spotify = SpotifyConnection::default());
-    Ok(true)
-}
-
-#[tauri::command]
-pub async fn spotify_status(
-    state: State<'_, AppState>,
-) -> CmdResult<crate::spotify::NowPlaying> {
-    let settings = state.settings();
-    let mut connection = settings.spotify.clone();
-    if connection.refresh_token.is_none() {
-        return Ok(crate::spotify::NowPlaying::disconnected());
-    }
-    let result = crate::spotify::now_playing(&mut connection, &settings.spotify_client_id).await?;
-    if connection.access_token != settings.spotify.access_token
-        || connection.expires_at != settings.spotify.expires_at
-    {
-        let saved = connection.clone();
-        state.update(|settings| settings.spotify = saved);
-    }
-    Ok(result)
-}
-
-#[tauri::command]
-pub async fn spotify_control(
-    state: State<'_, AppState>,
-    action: String,
-    position_ms: Option<u64>,
-) -> CmdResult<bool> {
-    let settings = state.settings();
-    let mut connection = settings.spotify.clone();
-    crate::spotify::control(
-        &mut connection,
-        &settings.spotify_client_id,
-        &action,
-        position_ms,
-    )
-    .await?;
-    if connection.access_token != settings.spotify.access_token
-        || connection.expires_at != settings.spotify.expires_at
-    {
-        let saved = connection.clone();
-        state.update(|settings| settings.spotify = saved);
-    }
+pub fn spotify_control(action: String, position_ms: Option<u64>) -> CmdResult<bool> {
+    crate::spotify::control(&action, position_ms)?;
     Ok(true)
 }
 

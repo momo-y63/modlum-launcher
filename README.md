@@ -24,7 +24,8 @@ arayüz **React + TypeScript**; sürüm ve loader kurulumunu, Java'yı ve hesapl
 - **Performans modu** — animasyonları, bulanıklığı ve saydamlık efektlerini kapatır.
 - **İçerik yönetimi** — modları aç/kapat, sil; resource pack, shader, datapack ve dünya klasörlerine erişim.
 - **Mojang haber akışı**, oyun süresi takibi, gerçek oyuncu avatarları ve RAM hazır ayarları.
-- **Spotify paneli** — arka planda çalan şarkıyı gör, parça değiştir, oynat/duraklat ve senkron sözleri takip et.
+- **Spotify paneli** — Windows medya oturumu üzerinden arka planda çalan şarkıyı gör, parça değiştir,
+  oynat/duraklat ve senkron sözleri takip et. Hesap bağlama, Client ID veya Premium gerekmez.
 - **Türkçe arayüz**, açık kaynak ve MIT lisanslı.
 
 | Kurulum turu | Bilgi / lisanslar |

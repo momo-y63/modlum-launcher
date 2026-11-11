@@ -59,8 +59,6 @@ pub fn run() {
             commands::logs_get,
             commands::logs_clear,
             commands::news_list,
-            commands::spotify_login,
-            commands::spotify_logout,
             commands::spotify_status,
             commands::spotify_control,
             commands::spotify_lyrics,

@@ -16,7 +16,6 @@ import type {
   NewsItem,
   NowPlaying,
   Settings,
-  SpotifyConnection,
   VersionSummary
 } from '../../shared/types'
 
@@ -86,8 +85,6 @@ export const api = {
     list: (): Promise<NewsItem[]> => call('news_list')
   },
   spotify: {
-    login: (): Promise<SpotifyConnection> => call('spotify_login'),
-    logout: (): Promise<boolean> => call('spotify_logout'),
     status: (): Promise<NowPlaying> => call('spotify_status'),
     control: (action: string, positionMs?: number): Promise<boolean> =>
       call('spotify_control', { action, positionMs }),

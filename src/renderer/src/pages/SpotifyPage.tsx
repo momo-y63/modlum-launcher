@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { Lyrics, NowPlaying, Settings } from '../../../shared/types'
+import type { Lyrics, NowPlaying } from '../../../shared/types'
 import { api, errorMessage } from '../api'
 import { Icon } from '../components/Icons'
 
 interface Props {
-  settings: Settings
-  onUpdate: (patch: Partial<Settings>) => Promise<Settings>
   onToast: (input: { kind: 'success' | 'error' | 'info'; title: string; body?: string }) => void
 }
 
@@ -13,8 +11,6 @@ interface LyricLine {
   at: number
   text: string
 }
-
-const REDIRECT_URI = 'http://127.0.0.1:8888/callback'
 
 function parseSynced(synced: string): LyricLine[] {
   const lines: LyricLine[] = []
@@ -33,8 +29,7 @@ function formatTime(ms: number): string {
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
 }
 
-export function SpotifyPage({ settings, onUpdate, onToast }: Props): React.JSX.Element {
-  const [clientId, setClientId] = useState(settings.spotifyClientId)
+export function SpotifyPage({ onToast }: Props): React.JSX.Element {
   const [now, setNow] = useState<NowPlaying | null>(null)
   const [lyrics, setLyrics] = useState<Lyrics | null>(null)
   const [lyricsFor, setLyricsFor] = useState<string | null>(null)
@@ -44,38 +39,32 @@ export function SpotifyPage({ settings, onUpdate, onToast }: Props): React.JSX.E
   const scrollRef = useRef<HTMLDivElement>(null)
   const lineRefs = useRef<(HTMLParagraphElement | null)[]>([])
 
-  const connected = Boolean(settings.spotify?.refreshToken)
   const track = now?.track ?? null
+  const duration = now?.durationMs || track?.durationMs || 0
 
   const refresh = useCallback(async (): Promise<void> => {
     try {
       const state = await api.spotify.status()
       setNow(state)
       setProgress(state.progressMs)
-      if (state.error) setError(state.error)
     } catch (err) {
       setError(errorMessage(err))
     }
   }, [])
 
   useEffect(() => {
-    if (!connected) {
-      setNow(null)
-      return
-    }
     void refresh()
-    const timer = window.setInterval(() => void refresh(), 2500)
+    const timer = window.setInterval(() => void refresh(), 2000)
     return () => window.clearInterval(timer)
-  }, [connected, refresh])
+  }, [refresh])
 
   useEffect(() => {
     if (!now?.playing) return
-    const duration = now.track?.durationMs ?? 0
     const timer = window.setInterval(() => {
       setProgress((prev) => (duration > 0 ? Math.min(duration, prev + 500) : prev + 500))
     }, 500)
     return () => window.clearInterval(timer)
-  }, [now?.playing, now?.track?.durationMs])
+  }, [now?.playing, duration])
 
   useEffect(() => {
     if (!track) {
@@ -89,7 +78,7 @@ export function SpotifyPage({ settings, onUpdate, onToast }: Props): React.JSX.E
     setLyricsFor(key)
     setLyrics(null)
     void api.spotify
-      .lyrics({ artist: track.artists, title: track.name, album: track.album, durationMs: track.durationMs })
+      .lyrics({ artist: track.artists, title: track.name, album: track.album, durationMs: duration })
       .then((result) => {
         if (!cancelled) setLyrics(result)
       })
@@ -99,7 +88,7 @@ export function SpotifyPage({ settings, onUpdate, onToast }: Props): React.JSX.E
     return () => {
       cancelled = true
     }
-  }, [track?.id, track?.name, track?.artists, track?.album, track?.durationMs, lyricsFor, track])
+  }, [track?.id, track?.name, track?.artists, track?.album, duration, lyricsFor, track])
 
   const lines = useMemo(() => (lyrics?.synced ? parseSynced(lyrics.synced) : []), [lyrics])
 
@@ -130,61 +119,26 @@ export function SpotifyPage({ settings, onUpdate, onToast }: Props): React.JSX.E
       setError(null)
       try {
         await api.spotify.control(action, positionMs)
-        window.setTimeout(() => void refresh(), 700)
+        window.setTimeout(() => void refresh(), 400)
       } catch (err) {
-        setError(errorMessage(err))
+        const message = errorMessage(err)
+        setError(message)
+        onToast({ kind: 'error', title: 'Spotify komutu çalışmadı', body: message })
       } finally {
         setBusy(null)
       }
     },
-    [refresh]
+    [onToast, refresh]
   )
 
-  const connect = useCallback(async (): Promise<void> => {
-    const id = clientId.trim()
-    if (!id) {
-      setError('Önce Spotify Client ID gir.')
-      return
-    }
-    setBusy('login')
-    setError(null)
-    try {
-      await onUpdate({ spotifyClientId: id })
-      const connection = await api.spotify.login()
-      await onUpdate({})
-      onToast({ kind: 'success', title: 'Spotify bağlandı', body: connection.displayName ?? undefined })
-    } catch (err) {
-      setError(errorMessage(err))
-    } finally {
-      setBusy(null)
-    }
-  }, [clientId, onToast, onUpdate])
-
-  const disconnect = useCallback(async (): Promise<void> => {
-    setBusy('logout')
-    setError(null)
-    try {
-      await api.spotify.logout()
-      await onUpdate({})
-      setNow(null)
-      setLyrics(null)
-      setLyricsFor(null)
-      onToast({ kind: 'info', title: 'Spotify bağlantısı kesildi' })
-    } catch (err) {
-      setError(errorMessage(err))
-    } finally {
-      setBusy(null)
-    }
-  }, [onToast, onUpdate])
-
   const seek = (event: React.MouseEvent<HTMLDivElement>): void => {
-    if (!track || track.durationMs === 0) return
+    if (!track || duration === 0) return
     const rect = event.currentTarget.getBoundingClientRect()
     const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
-    void control('seek', Math.round(ratio * track.durationMs))
+    void control('seek', Math.round(ratio * duration))
   }
 
-  const percent = track && track.durationMs > 0 ? Math.min(100, (progress / track.durationMs) * 100) : 0
+  const percent = duration > 0 ? Math.min(100, (progress / duration) * 100) : 0
 
   return (
     <>
@@ -193,21 +147,19 @@ export function SpotifyPage({ settings, onUpdate, onToast }: Props): React.JSX.E
           <div className="eyebrow">Müzik</div>
           <h1 className="page-title">Spotify</h1>
           <p className="page-sub">
-            Oyun açıkken arka planda çalan şarkıyı buradan gör, parça değiştir ve sözleri takip et.
+            Arka planda Spotify çalarken şarkıyı buradan gör, parça değiştir ve sözleri takip et.
+            Hesap bağlaman gerekmez.
           </p>
         </div>
-        {connected && (
-          <div className="row" style={{ gap: 8 }}>
-            <span className="badge installed">{settings.spotify.displayName ?? 'Bağlı'}</span>
-            <button className="btn outline sm" disabled={busy !== null} onClick={() => void connect()}>
-              <Icon name="refresh" size={14} />
-              Yeniden bağlan
-            </button>
-            <button className="btn ghost sm" disabled={busy !== null} onClick={() => void disconnect()}>
-              Bağlantıyı kes
-            </button>
-          </div>
-        )}
+        <div className="row" style={{ gap: 8 }}>
+          <span className={`badge${now?.available ? ' installed' : ''}`}>
+            {now?.available ? 'Medya oturumu açık' : 'Oturum bekleniyor'}
+          </span>
+          <button className="btn ghost sm" onClick={() => void refresh()}>
+            <Icon name="refresh" size={14} />
+            Yenile
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -217,177 +169,111 @@ export function SpotifyPage({ settings, onUpdate, onToast }: Props): React.JSX.E
         </div>
       )}
 
-      {!connected ? (
-        <div className="settings-stack stagger">
-          <div className="card">
-            <h3 className="card-title">
-              <Icon name="music" size={15} />
-              Spotify hesabını bağla
-            </h3>
-            <div className="field">
-              <label className="field-label">Spotify Client ID</label>
-              <input
-                className="input"
-                placeholder="ör. 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d"
-                value={clientId}
-                onChange={(event) => setClientId(event.target.value)}
-                onBlur={() => {
-                  if (clientId.trim() !== settings.spotifyClientId) {
-                    void onUpdate({ spotifyClientId: clientId.trim() })
-                  }
-                }}
-              />
-              <div className="field-hint">
-                {settings.spotifyClientId
-                  ? 'Client ID kayıtlı. Bağlan dediğinde tarayıcı açılır ve izin istenir.'
-                  : 'Girilmedi — Spotify paneli devre dışı.'}
-              </div>
-            </div>
-
-            <div className="row" style={{ gap: 8, marginTop: 14 }}>
-              <button className="btn primary" disabled={busy !== null} onClick={() => void connect()}>
-                {busy === 'login' ? <span className="spinner dark sm" /> : <Icon name="music" size={15} />}
-                {busy === 'login' ? 'Tarayıcı bekleniyor…' : "Spotify'a bağlan"}
-              </button>
-            </div>
-
-            <div className="card veil" style={{ marginTop: 16 }}>
-              <div className="setting-name" style={{ marginBottom: 10 }}>
-                4 adımda bağlantı
-              </div>
-              <ol className="tiny" style={{ margin: 0, paddingLeft: 18, lineHeight: 2, color: 'var(--muted)' }}>
-                <li>
-                  <span
-                    className="link"
-                    onClick={() => void api.shell.openUrl('https://developer.spotify.com/dashboard')}
-                  >
-                    developer.spotify.com/dashboard
-                  </span>{' '}
-                  → <b>Create app</b>.
-                </li>
-                <li>
-                  <b>Redirect URI</b> alanına şunu ekle:{' '}
-                  <code className="mono-code">{REDIRECT_URI}</code>
-                </li>
-                <li>
-                  App ayarlarında <b>Web API</b> erişimini aç ve <b>Client ID</b> değerini buraya yapıştır.
-                </li>
-                <li>
-                  <b>Spotify'a bağlan</b> → tarayıcıda izin ver. Uygulama geliştirme modunda olduğu için
-                  Spotify hesabını (ve en fazla 4 arkadaşını) Users alanına eklemen gerekir.
-                </li>
-              </ol>
-              <div className="field-hint" style={{ marginTop: 10 }}>
-                Parça değiştirme/oynatma kontrolü Spotify <b>Premium</b> ister; sözler ve şu an çalan bilgisi
-                her hesapta çalışır.
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="spotify-grid stagger">
-          <div className="card np-card">
-            <div className="np-cover">
-              {track?.image ? (
-                <img src={track.image} alt={track.name} draggable={false} />
-              ) : (
-                <Icon name="music" size={54} />
-              )}
-            </div>
-
-            <div className="np-meta">
-              <div className="np-title">{track?.name ?? 'Şu an bir şey çalmıyor'}</div>
-              <div className="np-artist">{track?.artists ?? 'Spotify’da müziği başlat'}</div>
-              {track?.album && <div className="np-album">{track.album}</div>}
-            </div>
-
-            <div className="np-bar" role="presentation" onClick={seek} title="Konuma atla">
-              <div className="np-bar-fill" style={{ width: `${percent}%` }} />
-            </div>
-            <div className="np-times">
-              <span>{formatTime(progress)}</span>
-              <span>{formatTime(track?.durationMs ?? 0)}</span>
-            </div>
-
-            <div className="np-controls">
-              <button
-                className="np-btn"
-                title="Önceki"
-                disabled={!track || busy !== null}
-                onClick={() => void control('previous')}
-              >
-                <Icon name="skipBack" size={20} />
-              </button>
-              <button
-                className="np-btn main"
-                title={now?.playing ? 'Duraklat' : 'Çal'}
-                disabled={!track || busy !== null}
-                onClick={() => void control(now?.playing ? 'pause' : 'play')}
-              >
-                <Icon name={now?.playing ? 'pause' : 'play'} size={22} />
-              </button>
-              <button
-                className="np-btn"
-                title="Sonraki"
-                disabled={!track || busy !== null}
-                onClick={() => void control('next')}
-              >
-                <Icon name="skipForward" size={20} />
-              </button>
-              <button
-                className="np-btn ghost"
-                title="Spotify'da aç"
-                disabled={!track?.url}
-                onClick={() => {
-                  if (track?.url) void api.shell.openUrl(track.url)
-                }}
-              >
-                <Icon name="external" size={18} />
-              </button>
-            </div>
-
-            <div className="np-device">{now?.device ? `Çalıyor: ${now.device}` : 'Cihaz bekleniyor'}</div>
-          </div>
-
-          <div className="card lyrics-card">
-            <h3 className="card-title">
-              <Icon name="quote" size={15} />
-              Sözler
-            </h3>
-
-            {lines.length > 0 ? (
-              <div className="lyrics-scroll" ref={scrollRef}>
-                {lines.map((line, index) => (
-                  <p
-                    key={`${line.at}-${index}`}
-                    ref={(element) => {
-                      lineRefs.current[index] = element
-                    }}
-                    className={`lyric-line${index === activeIndex ? ' active' : ''}`}
-                    onClick={() => void control('seek', Math.round(line.at * 1000))}
-                  >
-                    {line.text}
-                  </p>
-                ))}
-              </div>
-            ) : lyrics?.plain ? (
-              <div className="lyrics-scroll">
-                <p className="lyric-line plain">{lyrics.plain}</p>
-              </div>
+      <div className="spotify-grid stagger">
+        <div className="card np-card">
+          <div className="np-cover">
+            {track?.image ? (
+              <img src={track.image} alt={track.name} draggable={false} />
             ) : (
-              <div className="lyrics-empty">
-                {lyrics?.instrumental ? 'Bu şarkı enstrümantal.' : 'Söz bulunamadı.'}
-              </div>
-            )}
-
-            {lyrics && (
-              <div className="field-hint" style={{ marginTop: 10 }}>
-                {lyrics.synced ? 'Senkron sözler' : 'Düz sözler'} · LRCLIB
-              </div>
+              <Icon name="music" size={54} />
             )}
           </div>
+
+          <div className="np-meta">
+            <div className="np-title">{track?.name ?? 'Şu an bir şey çalmıyor'}</div>
+            <div className="np-artist">{track?.artists ?? 'Spotify’da bir şarkı başlat'}</div>
+            {track?.album && <div className="np-album">{track.album}</div>}
+          </div>
+
+          <div className="np-bar" role="presentation" onClick={seek} title="Konuma atla">
+            <div className="np-bar-fill" style={{ width: `${percent}%` }} />
+          </div>
+          <div className="np-times">
+            <span>{formatTime(progress)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+
+          <div className="np-controls">
+            <button
+              className="np-btn"
+              title="Önceki"
+              disabled={!track || busy !== null}
+              onClick={() => void control('previous')}
+            >
+              <Icon name="skipBack" size={20} />
+            </button>
+            <button
+              className="np-btn main"
+              title={now?.playing ? 'Duraklat' : 'Çal'}
+              disabled={!track || busy !== null}
+              onClick={() => void control(now?.playing ? 'pause' : 'play')}
+            >
+              <Icon name={now?.playing ? 'pause' : 'play'} size={22} />
+            </button>
+            <button
+              className="np-btn"
+              title="Sonraki"
+              disabled={!track || busy !== null}
+              onClick={() => void control('next')}
+            >
+              <Icon name="skipForward" size={20} />
+            </button>
+          </div>
+
+          <div className="np-device">
+            {now?.device ? now.device.replace(/\.exe$/i, '') : 'Spotify masaüstü uygulaması bekleniyor'}
+          </div>
+
+          {!now?.available && (
+            <div className="field-hint" style={{ textAlign: 'center' }}>
+              Spotify masaüstü uygulamasında bir şarkı başlat; panel otomatik olarak bağlanır.
+              Kontroller medya tuşları gibi çalıştığı için Premium gerekmez.
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="card lyrics-card">
+          <h3 className="card-title">
+            <Icon name="quote" size={15} />
+            Sözler
+          </h3>
+
+          {lines.length > 0 ? (
+            <div className="lyrics-scroll" ref={scrollRef}>
+              {lines.map((line, index) => (
+                <p
+                  key={`${line.at}-${index}`}
+                  ref={(element) => {
+                    lineRefs.current[index] = element
+                  }}
+                  className={`lyric-line${index === activeIndex ? ' active' : ''}`}
+                  onClick={() => void control('seek', Math.round(line.at * 1000))}
+                >
+                  {line.text}
+                </p>
+              ))}
+            </div>
+          ) : lyrics?.plain ? (
+            <div className="lyrics-scroll">
+              <p className="lyric-line plain">{lyrics.plain}</p>
+            </div>
+          ) : (
+            <div className="lyrics-empty">
+              {lyrics?.instrumental
+                ? 'Bu şarkı enstrümantal.'
+                : track
+                  ? 'Söz bulunamadı.'
+                  : 'Bir şarkı çalarken sözler burada görünür.'}
+            </div>
+          )}
+
+          {lyrics && (
+            <div className="field-hint" style={{ marginTop: 10 }}>
+              {lyrics.synced ? 'Senkron sözler' : 'Düz sözler'} · LRCLIB
+            </div>
+          )}
+        </div>
+      </div>
     </>
   )
 }

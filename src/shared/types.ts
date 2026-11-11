@@ -29,13 +29,6 @@ export interface Instance {
   playtimeSeconds: number
 }
 
-export interface SpotifyConnection {
-  refreshToken?: string
-  accessToken?: string
-  expiresAt: number
-  displayName?: string | null
-}
-
 export interface SpotifyTrack {
   id: string
   name: string
@@ -47,9 +40,10 @@ export interface SpotifyTrack {
 }
 
 export interface NowPlaying {
-  connected: boolean
+  available: boolean
   playing: boolean
   progressMs: number
+  durationMs: number
   device: string | null
   track: SpotifyTrack | null
   error: string | null
@@ -79,8 +73,6 @@ export interface Settings {
   playtime: Record<string, number>
   instances: Instance[]
   activeInstanceId: string | null
-  spotifyClientId: string
-  spotify: SpotifyConnection
 }
 
 export interface VersionSummary {

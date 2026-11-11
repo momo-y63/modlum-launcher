@@ -443,13 +443,7 @@ export default function App(): React.JSX.Element {
               />
             )}
 
-            {page === 'spotify' && (
-              <SpotifyPage
-                settings={settings}
-                onUpdate={updateSettings}
-                onToast={(input) => toast(input)}
-              />
-            )}
+            {page === 'spotify' && <SpotifyPage onToast={(input) => toast(input)} />}
 
             {page === 'settings' && (
               <SettingsPage
